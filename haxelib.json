@@ -1,0 +1,13 @@
+{
+    "name": "escape",
+    "url" : "https://github.com/profelis/escape",
+    "license": "MIT",
+    "tags": ["cross", "utils"],
+    "description": "small utils",
+    "classPath": "src",
+    "version": "0.0.1-alpha",
+    "releasenote": "first release",
+    "contributors": [
+        "deep"
+    ]
+}
