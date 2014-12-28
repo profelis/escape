@@ -96,7 +96,7 @@ class CommandManager implements ICommandManager
         return value;
     }
     
-    function get_depth():Int {
+    inline function get_depth():Int {
         return depth;
     }
     
