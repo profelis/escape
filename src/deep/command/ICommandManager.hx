@@ -14,10 +14,10 @@ interface ICommandManager extends IBindable
     public function undo():Void;
     public function redo():Void;
     
-    @:bindable(force = true)
+    @:bindable
     public var canUndo(get, never):Bool;
     
-    @:bindable(force = true)
+    @:bindable
     public var canRedo(get, never):Bool;
     
     public var depth(get, set):UInt;
