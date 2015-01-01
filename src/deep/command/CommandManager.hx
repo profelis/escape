@@ -21,64 +21,73 @@ class CommandManager implements ICommandManager
     @:bindable(force = true)
     public var canRedo(get, never):Bool;
     
+    var prevCanUndo:Bool;
+    var prevCanRedo:Bool;
+    
     public function new() {
-        clear();
-    }
-
-    public function clear() {
         undoStack = [];
         redoStack = [];
     }
-    
-    public function execute(command:ICommand):Void {
-        var prevCanUndo = canUndo;
-        var prevCanRedo = canRedo;
-        
-        undoStack.push(command);
-        
-        limitDepth(undoStack, depth);
+
+    public function clear() {
+        limitDepth(undoStack, 0);
         limitDepth(redoStack, 0);
-        
-        command.execute();
-        
+    }
+    
+    inline function storeState() {
+        prevCanRedo = canRedo;
+        prevCanUndo = canUndo;
+    }
+    
+    inline function notifyUpdate() {
         if (prevCanUndo != this.canUndo)
             Bind.notify(this.canUndo, prevCanUndo, !prevCanUndo);
+            
+        if (prevCanRedo != this.canRedo)
+            Bind.notify(this.canRedo, prevCanRedo, !prevCanRedo);
+    }
+    
+    public function execute(command:ICommand):Void {
+        internalAdd(command);
+        limitDepth(redoStack, 0);
+        command.execute();
+        notifyUpdate();
+    }
+    
+    public function add(command:ICommand):Void {
+        internalAdd(command);
+        notifyUpdate();
+    }
+    
+    inline function internalAdd(command:ICommand):Void {
+        storeState();
+        
+        undoStack.push(command);
+        limitDepth(undoStack, depth);
     }
     
     public function undo():Void {
         if (!canUndo) throw "can't undo";
-        var prevCanUndo = canUndo;
-        var prevCanRedo = canRedo;
+        storeState();
         
         var command = undoStack.pop();
         redoStack.push(command);
         limitDepth(redoStack, depth);
-        
         command.undo();
         
-        if (prevCanUndo != this.canUndo)
-            Bind.notify(this.canUndo, prevCanUndo, !prevCanUndo);
-            
-        if (prevCanRedo != this.canRedo)
-            Bind.notify(this.canRedo, prevCanRedo, !prevCanRedo);
+        notifyUpdate();
     }
     
     public function redo():Void {
         if (!canRedo) throw "can't redo";
-        var prevCanUndo = canUndo;
-        var prevCanRedo = canRedo;
+        storeState();
         
         var command = redoStack.pop();
         undoStack.push(command);
         limitDepth(undoStack, depth);
-        
         command.redo();
         
-        if (prevCanUndo != this.canUndo)
-            Bind.notify(this.canUndo, prevCanUndo, !prevCanUndo);
-            
-        if (prevCanRedo != this.canRedo)
-            Bind.notify(this.canRedo, prevCanRedo, !prevCanRedo);
+        notifyUpdate();
     }
     
     inline function get_canUndo() {
@@ -91,8 +100,10 @@ class CommandManager implements ICommandManager
     
     function set_depth(value:Int):Int {
         depth = value;
+        if (value < 1) storeState();
         limitDepth(undoStack, depth);
         limitDepth(redoStack, depth);
+        if (value < 1) notifyUpdate();
         return value;
     }
     
@@ -107,4 +118,14 @@ class CommandManager implements ICommandManager
             if (cmd != null) cmd.destroy();
         }
     }
+    
+    public function destroy(deep:Bool = true):Void {
+        destructed = true;
+        limitDepth(undoStack, 0);
+        limitDepth(redoStack, 0);
+        undoStack = null;
+        redoStack = null;
+    }
+    
+    public var destructed(default, null):Bool = false;
 }
