@@ -4,11 +4,11 @@ class DispatcherTools {
 
 #if (flash || openfl)
 
-    public static function mapNil(ed:flash.events.IEventDispatcher, eventTypes:Map<String, Int>):Dispatcher<thx.core.Nil> {
+    public static function mapNil(ed:flash.events.IEventDispatcher, eventTypes:Map<String, Int>):Dispatcher<thx.Nil> {
     	var res = Dispatcher.create();
 		for (eventType in eventTypes.keys()) {
 	    	ed.addEventListener(eventType, function (e:flash.events.Event) {
-	    		res.notify(thx.core.Nil.nil, eventTypes.get(e.type));
+	    		res.notify(thx.Nil.nil, eventTypes.get(e.type));
 	    	});
 	    }
     	return res;
