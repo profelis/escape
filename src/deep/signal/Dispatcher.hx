@@ -34,7 +34,7 @@ class Dispatcher<T> {
         return pos;
     }
 
-    public function attach(o:Listener<T>, type:Int = 0) {
+    public function attach(o:Listener<T>, type:Int = 0, force = false):Int {
         var pos = getListenerPos(o);
         var od;
         if (pos == -1) {
@@ -46,7 +46,7 @@ class Dispatcher<T> {
         if (type == 0)
             od.type = -1;
         else
-            od.type |= type;
+            od.type = force ? type : od.type | type;
 
         return od.type;
     }
@@ -76,8 +76,8 @@ class Dispatcher<T> {
         return null;
     }
 
-    public inline function listen(attach:Bool, o:Listener<T>, type:Int = 0):Null<Int> {
-        return if (attach) this.attach(o, type) else this.detach(o, type);
+    public inline function listen(attach:Bool, o:Listener<T>, type:Int = 0, force = false):Null<Int> {
+        return if (attach) this.attach(o, type, force) else this.detach(o, type);
     }
 
     public function getListenerType(o:Listener<T>):Null<Int> {
