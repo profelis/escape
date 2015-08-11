@@ -1,4 +1,5 @@
 package deep.display;
+
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 
@@ -20,6 +21,12 @@ class DisplayObjectTools
 			if (t == tp) return p;
 		}
 		return null;
+	}
+
+	static public function removeFromParent(c:DisplayObject):Bool {
+		if (c.parent == null) return false;
+		c.parent.removeChild(c);
+		return true;
 	}
 	
 }
