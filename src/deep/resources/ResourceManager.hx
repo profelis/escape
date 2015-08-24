@@ -5,7 +5,7 @@ import bindx.Bind;
 
 class ResourceManager implements IBindable {
 
-    var bundles:Map<String, Map<String, ResourceBundle>>;
+    var bundles:Map<String, Map<String, IResourceBundle>>;
 
     public var locales:Array<String> = ["en_US"];
 
@@ -13,18 +13,18 @@ class ResourceManager implements IBindable {
         bundles = new Map();
     }
 
-    inline function getOrCreateBundles(locale:String):Map<String, ResourceBundle> {
+    inline function getOrCreateBundles(locale:String):Map<String, IResourceBundle> {
         var res = bundles.get(locale);
         if (res == null) bundles.set(locale, res = new Map());
         return res;
     }
 
-    public function addBundle(bundle:ResourceBundle):Void {
+    public function addBundle(bundle:IResourceBundle):Void {
         var res = getOrCreateBundles(bundle.locale);
         res.set(bundle.bundleName, bundle);
     }
 
-    public inline function getBundles(locale:String):Iterator<ResourceBundle> {
+    public inline function getBundles(locale:String):Iterator<IResourceBundle> {
         var res = bundles.get(locale);
         return res == null ? null : res.iterator();
     }
@@ -39,13 +39,13 @@ class ResourceManager implements IBindable {
             var bundles = bundles.get(locale);
             if (bundles == null) return null;
             var bundle = bundles.get(bundleName);
-            return bundle != null ? bundle.content.get(resourceName) : null;
+            return bundle != null ? bundle.get(resourceName) : null;
         }
         for (locale in locales) {
             var bundles = bundles.get(locale);
             if (bundles == null) continue;
             var bundle = bundles.get(bundleName);
-            if (bundle != null && bundle.content.exists(resourceName)) return bundle.content.get(resourceName);
+            if (bundle != null && bundle.exists(resourceName)) return bundle.get(resourceName);
         }
         return null;
     }
