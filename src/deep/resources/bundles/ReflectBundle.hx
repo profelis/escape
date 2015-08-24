@@ -25,7 +25,7 @@ class ReflectBundle implements IResourceBundle {
 
     public inline function get(name:String):String { return Reflect.field(content, name); }
     public inline function set(name:String, value:String):Void { Reflect.setField(content, name, value); }
-    public inline function exists(name:String):Bool { return Reflect.hasField(content, name); }
+    public inline function exists(name:String):Bool { return #if cpp Reflect.field(content, name) != null; #else Reflect.hasField(content, name); #end }
 
     public inline function toString():String { return Std.string(content); }
 }
