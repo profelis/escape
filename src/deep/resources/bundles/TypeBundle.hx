@@ -1,19 +1,23 @@
 package deep.resources.bundles;
 
-class ReflectBundle implements IResourceBundle {
+
+
+class TypeBundle implements IResourceBundle {
 
     public var locale(default, null):String;
     public var bundleName(default, null):String;
 
     var content:Dynamic;
+    var _keys:Array<String>;
 
-    public function new(content:Dynamic, locale:String, bundleName:String) {
+    public function new(content:Class<Dynamic>, locale:String, bundleName:String) {
         this.locale = locale;
         this.bundleName = bundleName;
-        this.content = content;
+        this.content = Type.createInstance(content, []);
+        _keys = Type.getInstanceFields(content);
     }
 
-    public inline function keys():Iterator<String> { return Reflect.fields(content).iterator(); }
+    public inline function keys():Iterator<String> { return _keys.iterator(); }
     public inline function values():Iterator<String> {
         var keys = this.keys();
         var current:String;
@@ -24,7 +28,7 @@ class ReflectBundle implements IResourceBundle {
     }
 
     public inline function get(name:String):String { return Reflect.field(content, name); }
-    public inline function exists(name:String):Bool { return #if cpp Reflect.field(content, name) != null; #else Reflect.hasField(content, name); #end }
+    public inline function exists(name:String):Bool { return _keys.indexOf(name) > -1; }
 
     public inline function toString():String { return Std.string(content); }
 }
