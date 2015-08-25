@@ -52,7 +52,7 @@ class ResourceManager implements IBindable {
 
     @:bindable public inline function getString(bundleName:String, resourceName:String, params:Map<String, String> = null, locale:String = null):String {
         var res = getRawData(bundleName, resourceName, locale);
-        return res == null ? null : params != null ? replaceParams(res, params) : res;
+        return res == null ? '{$bundleName:$resourceName}' : params != null ? replaceParams(res, params) : res;
     }
 
     inline function replaceParams(str:String, params:Map<String, String>) {
