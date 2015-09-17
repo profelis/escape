@@ -113,7 +113,7 @@ class CommandManager implements ICommandManager
     
     inline function limitDepth(stack:Array<ICommand>, depth:Int):Void {
         var n:Int = stack.length - depth;
-        while (--n > 0) {
+        while (n-- > 0) {
             var cmd = stack.shift();
             if (cmd != null) cmd.destroy();
         }
